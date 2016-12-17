@@ -83,9 +83,9 @@ clearFrame = (param) ->
   clearColorBlue = param.clearColorBlue or 0
   clearColorAlpha = param.clearColorAlpha or 0
   updateFlag =
-    glState.clearColorRed != param.clearColorRed
-    glState.clearColorGreen != param.clearColorGreen
-    glState.clearColorBlue != param.clearColorBlue
+    glState.clearColorRed != param.clearColorRed or
+    glState.clearColorGreen != param.clearColorGreen or
+    glState.clearColorBlue != param.clearColorBlue or
     glState.clearColorAlpha != param.clearColorAlpha
   if updateFlag
     glState.clearColorRed = param.clearColorRed
@@ -212,7 +212,7 @@ bindUniform = (name, data) ->
       nowTexture = nowTexture + 1
     else
       console.error("Unknow uniform type.")
-    return
+  return
 
 drawCall = (param) ->
   viewPortOx = param.viewPortOx ? 0
@@ -335,8 +335,8 @@ drawCall = (param) ->
   stencilFrontOpZFail = glState.stencilFrontOpZFail or webGL.KEEP
   stencilFrontOpPass = glState.stencilFrontOpPass or webGL.KEEP
   updateFlag =
-    glState.stencilFrontOpFail != stencilFrontOpFail
-    glState.stencilFrontOpZFail != stencilFrontOpZFail
+    glState.stencilFrontOpFail != stencilFrontOpFail or
+    glState.stencilFrontOpZFail != stencilFrontOpZFail or
     glState.stencilFrontOpPass != stencilFrontOpPass
   if updateFlag
     glState.stencilFrontOpFail = stencilFrontOpFail
@@ -366,8 +366,8 @@ drawCall = (param) ->
   stencilBackOptZFail = glState.stencilBackOptZFail or webGL.KEEP
   stencilBackOptPass = glState.stencilBackOptPass or webGL.KEEP
   updateFlag =
-    glState.stencilBackOptFail != stencilBackOptFail
-    glState.stencilBackOptZFail != stencilBackOptZFail
+    glState.stencilBackOptFail != stencilBackOptFail or
+    glState.stencilBackOptZFail != stencilBackOptZFail or
     glState.stencilBackOptPass != stencilBackOptPass
   if updateFlag
     glState.stencilBackOptFail = stencilBackOptFail
@@ -406,9 +406,9 @@ drawCall = (param) ->
   blendRefBlue = glState.blendRefBlue or 0
   blendRefAlpha = glState.blendRefAlpha or 0
   updateFlag =
-    glState.blendRefRed != blendRefRed
-    glState.blendRefGreen != blendRefGreen
-    glState.blendRefBlue != blendRefBlue
+    glState.blendRefRed != blendRefRed or
+    glState.blendRefGreen != blendRefGreen or
+    glState.blendRefBlue != blendRefBlue or
     glState.blendRefAlpha != blendRefAlpha
   if updateFlag
     glState.blendRefRed = blendRefRed
@@ -422,9 +422,9 @@ drawCall = (param) ->
   blendDstRGBFunc = glState.blendDstRGBFunc or webGL.ONE_MINUS_SRC_ALPHA
   blendDstAlphaFunc = glState.blendDstAlphaFunc or webGL.ONE_MINUS_SRC_ALPHA
   updateFlag =
-    glState.blendSrcRGBFunc != blendSrcRGBFunc
-    glState.blendSrcAlphaFunc != blendSrcAlphaFunc
-    glState.blendDstRGBFunc != blendDstRGBFunc
+    glState.blendSrcRGBFunc != blendSrcRGBFunc or
+    glState.blendSrcAlphaFunc != blendSrcAlphaFunc or
+    glState.blendDstRGBFunc != blendDstRGBFunc or
     glState.blendDstAlphaFunc != blendDstAlphaFunc
   if updateFlag
     glState.blendSrcRGBFunc = blendSrcRGBFunc
@@ -436,7 +436,7 @@ drawCall = (param) ->
   blendRGBOpt = glState.blendRGBOpt or webGL.FUNC_ADD
   blendAlphaOpt = glState.blendAlphaOpt or webGL.FUNC_ADD
   updateFlag =
-    glState.blendRGBOpt != blendRGBOpt
+    glState.blendRGBOpt != blendRGBOpt or
     glState.blendAlphaOpt != blendAlphaOpt
   if updateFlag
     glState.blendRGBOpt = blendRGBOpt
@@ -448,9 +448,9 @@ drawCall = (param) ->
   colorMaskBlue = glState.colorMaskBlue or false
   colorMaskAlpha = glState.colorMaskAlpha or false
   updateFlag =
-    glState.colorMaskRed != colorMaskRed
-    glState.colorMaskGreen != colorMaskGreen
-    glState.colorMaskBlue != colorMaskBlue
+    glState.colorMaskRed != colorMaskRed or
+    glState.colorMaskGreen != colorMaskGreen or
+    glState.colorMaskBlue != colorMaskBlue or
     glState.colorMaskAlpha != colorMaskAlpha
   if updateFlag
     glState.colorMaskRed = colorMaskRed

@@ -2,7 +2,10 @@
 # wrap
 # # # # # # # # # # # # # # # # # # # #
 
-glw =
+return {
+  canvas: canvas
+  webGL: webGL
+
   TextureFormat: TextureFormat
   TextureWrap: TextureWrap
   TextureFilter: TextureFilter
@@ -31,3 +34,4 @@ glw =
 
   clearFrame: clearFrame
   drawCall: drawCall
+}

@@ -2,6 +2,18 @@
 # const
 # # # # # # # # # # # # # # # # # # # #
 
+canvas = document.createElement("canvas")
+webGL = canvas.getContext("webgl") or
+  canvas.getContext("experimental-webgl") or
+  canvas.getContext("webkit-3d") or
+  canvas.getContext("moz-webgl") or
+  canvas.getContext("webkit-webgl") or
+  canvas.getContext("ms-webgl") or
+  canvas.getContext("o-webgl")
+if not webGL
+  return null
+
+
 TextureFormat = (name, glFormat, glMemeory) ->
   @name = name
   @glFormat = glFormat
