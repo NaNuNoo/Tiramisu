@@ -237,7 +237,7 @@ writeIndex = (ctx, idxText) ->
   ctx.vtxBufLen = ctx.vtxBufLen + 1
   return
 
-parseObj = (text) ->
+objFile = (text) ->
   ctx = createContext()
   ptr = 0
   textLen = text.length
@@ -314,29 +314,3 @@ parseObj = (text) ->
     textureStride: ctx.textureStride
     normalStride: ctx.normalStride
   }
-
-objFile = """
-# ......
-
-v  -0.5000 0.0000 0.5000
-v  -0.5000 0.0000 0.3750
-v  -0.3750 0.0000 0.3750
-v  -0.3750 0.0000 0.5000
-
-vn 0.0000 -1.0000 -0.0000
-vn 0.0000 -1.0000 -0.0000
-vn 0.0000 -1.0000 -0.0000
-vn 0.0000 -1.0000 -0.0000
-
-vt 1.0000 0.0000 0.0000
-vt 1.0000 0.1250 0.0000
-vt 0.8750 0.1250 0.0000
-vt 0.8750 0.0000 0.0000
-
-f 1/1/1 2/2/1 3/3/1
-f 3/3/1 4/4/1 1/1/1
-"""
-
-debugger
-res = parseObj(objFile)
-console.log(res)

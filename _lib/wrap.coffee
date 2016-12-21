@@ -23,6 +23,8 @@ return {
   createBufferIdx_Array: createBufferIdx_Array
   createBufferIdx_Size: createBufferIdx_Size
   destoryBufferIdx: destoryBufferIdx
+  createBufferMesh_Obj: createBufferMesh_Obj
+  destoryBufferMesh: destoryBufferMesh
 
   createTexture2D_Image: createTexture2D_Image
   createTexture2D_Data: createTexture2D_Data

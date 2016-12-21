@@ -104,152 +104,13 @@ destoryBufferIdx = (bufferIdx) ->
   return
 
 
-parseObjFile = do ->
-  createContext = () ->
-    return {
-      vertex: new Array(512 * 3)
-      vertexLen: 0
-      texture: new Array(512 * 2)
-      textureLen: 0
-      normal: new Array(512 * 3)
-      normalLen: 0
-
-      initBufFormat: false
-      vertexFlag: false
-      textureFlag: false
-      normalFlag: false
-
-      vtxBuf: null
-      vtxBufLen: 0
-      vtxBufPtr: 0
-      vtxStride: 0
-      idxBuf: null
-      idxBufLen: 0
-      idxMap: Object.create(null)
-    }
-
-  parseVertex = (ctx, wordArray, lineNo) ->
-    if 4 != wordArray.length
-      throw new Error("ERR obj file line #{lineNo}")
-    ctx.vertex[ctx.vertexLen * 3 + 0] = parseFloat(wordArray[1])
-    ctx.vertex[ctx.vertexLen * 3 + 1] = parseFloat(wordArray[2])
-    ctx.vertex[ctx.vertexLen * 3 + 2] = parseFloat(wordArray[3])
-    vertexLen = vertexLen + 1
-    return
-
-  parseTexture = (ctx, wordArray, lineNo) ->
-    if 3 != wordArray.length
-      throw new Error("ERR obj file line #{lineNo}")
-    ctx.texture[ctx.textureLen * 2 + 0] = parseFloat(wordArray[1])
-    ctx.texture[ctx.textureLen * 2 + 1] = parseFloat(wordArray[2])
-    textureLen = textureLen + 1
-    return
-
-  parseNormal = (ctx, wordArray, lineNo) ->
-    if 4 != wordArray.length
-      throw new Error("ERR obj file line #{lineNo}")
-    ctx.normal[ctx.normalLen * 3 + 0] = parseFloat(wordArray[1])
-    ctx.normal[ctx.normalLen * 3 + 1] = parseFloat(wordArray[2])
-    ctx.normal[ctx.normalLen * 3 + 2] = parseFloat(wordArray[3])
-    normalLen = normalLen + 1
-    return
-
-  initBufFormat = (ctx, numArray) ->
-    if not ctx.initBufFormat
-      ctx.initBufFormat = true
-      # vertex
-      ctx.vertexFlag = true
-      ctx.vtxStride += 3
-      # texture
-      if numArray[1]
-        ctx.textureFlag = true
-        ctx.vtxStride += 2
-      # normal
-      if numArray[2]
-        ctx.normalFlag = true
-        ctx.vtxStride += 3
-    ctx.vtxBuf = new Array(512 * ctx.vtxStride)
-    ctx.idxBuf = new Array(1024)
-    return
-
-  copyToVtxBuf = (ctx, array, start, count) ->
-    for idx in [0...count] by 1
-      ctx.vtxBuf[ctx.vtxBufPtr + idx] = array[start + idx]
-    ctx.vtxBufPtr = ctx.vtxBufPtr + count
-    return
-
-  parseFace = (ctx, wordArray, lineNo) ->
-    if 4 != wordArray.length
-      throw new Error("ERR obj file line #{lineNo}")
-    for idx in [1...4] by 1
-      numText = wordArray[idx]
-      vtxIdx = ctx.idxMap[numText]
-      if vtxIdx
-        ctx.idxBuf[ctx.idxBufLen] = vtxIdx
-        ctx.idxBufLen = ctx.idxBufLen + 1
-      else
-        numArray = numText.split('/')
-        initBufFormat(ctx, numArray)
-        if ctx.vertexFlag
-          if not numArray[0]
-            throw new Error("ERR obj file line #{lineNo}")
-          index = parseInt(numArray[0]) - 1
-          copyToVtxBuf(ctx, ctx.vertex, index, index * 3, 3)
-        if ctx.textureFlag
-          if not numArray[1]
-            throw new Error("ERR obj file line #{lineNo}")
-          index = parseInt(numArray[1]) - 1
-          copyToVtxBuf(ctx, ctx.texture, index, index * 2, 2)
-        if ctx.normalFlag
-          if not numArray[2]
-            throw new Error("ERR obj file line #{lineNo}")
-          index = parseInt(numArray[2]) - 1
-          copyToVtxBuf(ctx, ctx.normal, index, index * 3, 3)
-        ctx.vtxBufLen = ctx.vtxBufLen + 1
-      ctx.idxBuf[ctx.idxBufLen] = ctx.vtxBufLen - 1
-      ctx.idxBufLen = ctx.idxBufLen + 1
-      ctx.idxMap[numText] = ctx.vtxBufLen - 1
-    return
-
-  return (objText) ->
-    lineArray = objText.split(/\r\n|\n\r|\n/)
-    for line, lineNo in lineArray
-      lineNo = lineNo + 1
-      if 0 == line.length
-        continue
-      if '#' == line[0]
-        continue
-      if ' ' == line[0]
-        continue
-      wordArray = line.split(/\s+/)
-      switch wordArray[0]
-        when 'v' then parseVertex(ctx, wordArray, lineNo)
-        when 'vn' then parseNormal(ctx, wordArray, lineNo)
-        when 'vt' then parseTexture(ctx, wordArray, lineNo)
-        when 'f' then parseFace(ctx, wordArray, lineNo)
-        when 'g' then # ignore
-        when 'o' then # ignore
-        when 's' then # ignore
-        when 'mtllib' then # ignore
-        when 'usemtl' then # ignore
-        else throw new Error("ERR obj file line #{lineNo}")
-    ctx.vtxBuf.length = ctx.vtxBufLen * ctx.vtxStride
-    ctx.idxBuf.length = ctx.idxBufLen
-    return {
-      vtxBuf: new Float32Array(ctx.vtxBuf)
-      idxBuf: new Float32Array(ctx.idxBuf)
-      isVertex: ctx.vertexFlag
-      isTexture: ctx.textureFlag
-      isNormal: ctx.normalFlag
-    }
-
 BufferMesh = () ->
   @_hVertex = null
   @_hIndex = null
   @_usage = BufferUsage.STATIC
-  @_isVertex = false
-  @_isTexture = false
-  @_isNormal = false
+  @_vertexStride = 0
+  @_textureStride = 0
+  @_normalStride = 0
   return
 
 xhrPromise = (url) ->
@@ -266,12 +127,12 @@ createBufferMesh_Obj = (url) ->
   return xhrPromise(url)
   .then (objText) ->
     new Promise (resolve, reject) ->
-      objData = parseObjFile(objText)
+      objData = objFile(objText)
       # BufferMesh
       bufferMesh = new BufferMesh()
-      bufferMesh._isVertex = objData.vertexFlag
-      bufferMesh._isTexture = objData.textureFlag
-      bufferMesh._isNormal = objData.normalFlag
+      bufferMesh._vertexStride = objData.vertexStride
+      bufferMesh._textureStride = objData.textureStride
+      bufferMesh._normalStride = objData.normalStride
       # vertex buffer
       bufferMesh._hVertex = webGL.createBuffer()
       if not bufferMesh._hVertex
@@ -296,6 +157,6 @@ destoryBufferMesh = (bufferMesh) ->
     webGL.deleteBuffer(bufferMesh._hIndex)
   bufferMesh._hIndex = null
   bufferMesh._usage = BufferUsage.STATIC
-  bufferMesh._isVertex = false
-  bufferMesh._isTexture = false
-  bufferMesh._isNormal = false
+  bufferMesh._vertexStride = false
+  bufferMesh._textureStride = false
+  bufferMesh._normalStride = false
