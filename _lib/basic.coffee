@@ -2,14 +2,13 @@
 # const
 # # # # # # # # # # # # # # # # # # # #
 
-canvas = document.createElement("canvas")
-webGL = canvas.getContext("webgl") or
-  canvas.getContext("experimental-webgl") or
-  canvas.getContext("webkit-3d") or
-  canvas.getContext("moz-webgl") or
-  canvas.getContext("webkit-webgl") or
-  canvas.getContext("ms-webgl") or
-  canvas.getContext("o-webgl")
+webGL = argCanvas.getContext("webgl", argParam) or
+  argCanvas.getContext("experimental-webgl", argParam) or
+  argCanvas.getContext("webkit-3d", argParam) or
+  argCanvas.getContext("moz-webgl", argParam) or
+  argCanvas.getContext("webkit-webgl", argParam) or
+  argCanvas.getContext("ms-webgl", argParam) or
+  argCanvas.getContext("o-webgl", argParam)
 if not webGL
   return null
 
@@ -159,20 +158,20 @@ GLSLType.fromGLType = (webGLType) ->
     else null
 
 GLSLType.BOOL = new GLSLType(0, "bool", webGL.BOOL, 1, 1)
-GLSLType.BVEC2 = new GLSLType(1, "bvec2", webGL.BOOL_VEC2, 1, 2)
-GLSLType.BVEC3 = new GLSLType(2, "bvec3", webGL.BOOL_VEC3, 1, 3)
-GLSLType.BVEC4 = new GLSLType(3, "bvec4", webGL.BOOL_VEC4, 1, 4)
+GLSLType.BVEC2 = new GLSLType(1, "bvec2", webGL.BOOL, 1, 2)
+GLSLType.BVEC3 = new GLSLType(2, "bvec3", webGL.BOOL, 1, 3)
+GLSLType.BVEC4 = new GLSLType(3, "bvec4", webGL.BOOL, 1, 4)
 GLSLType.INT = new GLSLType(4, "int", webGL.INT, 4, 1)
-GLSLType.IVEC2 = new GLSLType(5, "ivec2", webGL.INT_VEC2, 4, 2)
-GLSLType.IVEC3 = new GLSLType(6, "ivec3", webGL.INT_VEC3, 4, 3)
-GLSLType.IVEC4 = new GLSLType(7, "ivec4", webGL.INT_VEC4, 4, 4)
+GLSLType.IVEC2 = new GLSLType(5, "ivec2", webGL.INT, 4, 2)
+GLSLType.IVEC3 = new GLSLType(6, "ivec3", webGL.INT, 4, 3)
+GLSLType.IVEC4 = new GLSLType(7, "ivec4", webGL.INT, 4, 4)
 GLSLType.FLOAT = new GLSLType(8, "float", webGL.FLOAT, 4, 1)
-GLSLType.VEC2 = new GLSLType(9, "vec2", webGL.FLOAT_VEC2, 4, 2)
-GLSLType.VEC3 = new GLSLType(10, "vec3", webGL.FLOAT_VEC3, 4, 3)
-GLSLType.VEC4 = new GLSLType(11, "vec4", webGL.FLOAT_VEC4, 4, 4)
-GLSLType.MAT2 = new GLSLType(12, "mat2", webGL.FLOAT_MAT2, 4, 4)
-GLSLType.MAT3 = new GLSLType(13, "mat3", webGL.FLOAT_MAT3, 4, 9)
-GLSLType.MAT4 = new GLSLType(14, "mat4", webGL.FLOAT_MAT4, 4, 16)
+GLSLType.VEC2 = new GLSLType(9, "vec2", webGL.FLOAT, 4, 2)
+GLSLType.VEC3 = new GLSLType(10, "vec3", webGL.FLOAT, 4, 3)
+GLSLType.VEC4 = new GLSLType(11, "vec4", webGL.FLOAT, 4, 4)
+GLSLType.MAT2 = new GLSLType(12, "mat2", webGL.FLOAT, 4, 4)
+GLSLType.MAT3 = new GLSLType(13, "mat3", webGL.FLOAT, 4, 9)
+GLSLType.MAT4 = new GLSLType(14, "mat4", webGL.FLOAT, 4, 16)
 GLSLType.SAMPLER_2D = new GLSLType(15, "sampler2d", webGL.SAMPLER_2D, 4, 1)
 GLSLType.SAMPLER_CUBE = new GLSLType(16, "samplerCube", webGL.SAMPLER_CUBE, 4, 1)
 

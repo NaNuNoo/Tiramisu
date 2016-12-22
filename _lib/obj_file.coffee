@@ -176,13 +176,13 @@ writeIndex = (ctx, idxText) ->
   if not ctx.initFlag
     ctx.initFlag = true
     ctx.totalStride = 0
-    if '' != numArray[0]
+    if '' != numArray[0] and undefined != numArray[0]
       ctx.vertexStride = VERTEX_STRIDE
       ctx.totalStride = ctx.totalStride + VERTEX_STRIDE
-    if '' != numArray[1]
+    if '' != numArray[1] and undefined != numArray[1]
       ctx.textureStride = TEXTURE_STRIDE
       ctx.totalStride = ctx.totalStride + TEXTURE_STRIDE
-    if '' != numArray[2]
+    if '' != numArray[2] and undefined != numArray[2]
       ctx.normalStride = NORMAL_STRIDE
       ctx.totalStride = ctx.totalStride + NORMAL_STRIDE
     ctx.vtxBuf = new Array(ctx.totalStride * 512)
@@ -226,9 +226,9 @@ writeIndex = (ctx, idxText) ->
     ni = ni - 1
     if ni > ctx.normalLen
       throw new Error()
-    ctx.vtxBuf[ctx.totalStride * ctx.vtxBufLen + offset++] = ctx.vertex[NORMAL_STRIDE * ni + 0]
-    ctx.vtxBuf[ctx.totalStride * ctx.vtxBufLen + offset++] = ctx.vertex[NORMAL_STRIDE * ni + 1]
-    ctx.vtxBuf[ctx.totalStride * ctx.vtxBufLen + offset++] = ctx.vertex[NORMAL_STRIDE * ni + 2]
+    ctx.vtxBuf[ctx.totalStride * ctx.vtxBufLen + offset++] = ctx.normal[NORMAL_STRIDE * ni + 0]
+    ctx.vtxBuf[ctx.totalStride * ctx.vtxBufLen + offset++] = ctx.normal[NORMAL_STRIDE * ni + 1]
+    ctx.vtxBuf[ctx.totalStride * ctx.vtxBufLen + offset++] = ctx.normal[NORMAL_STRIDE * ni + 2]
   # 填充index
   if ptr != idxText.length
     throw new Error()

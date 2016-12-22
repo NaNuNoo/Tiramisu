@@ -78,10 +78,10 @@ glState = {
 }
 
 clearFrame = (param) ->
-  clearColorRed = param.clearColorRed or 0
-  clearColorGreen = param.clearColorGreen or 0
-  clearColorBlue = param.clearColorBlue or 0
-  clearColorAlpha = param.clearColorAlpha or 0
+  clearColorRed = param.clearColorRed ? 0
+  clearColorGreen = param.clearColorGreen ? 0
+  clearColorBlue = param.clearColorBlue ? 0
+  clearColorAlpha = param.clearColorAlpha ? 0
   updateFlag =
     glState.clearColorRed != param.clearColorRed or
     glState.clearColorGreen != param.clearColorGreen or
@@ -94,12 +94,12 @@ clearFrame = (param) ->
     glState.clearColorAlpha = param.clearColorAlpha
     webGL.clearColor(glState.clearColorRed, glState.clearColorGreen, glState.clearColorBlue, glState.clearColorAlpha)
 
-  clearDepth = param.clearDepth or 1.0
+  clearDepth = param.clearDepth ? 1.0
   if glState.clearDepth != clearDepth
     glState.clearDepth = clearDepth
     webGL.clearDepth(clearDepth)
 
-  clearStencil = param.clearStencil or 0x00000000
+  clearStencil = param.clearStencil ? 0x00000000
   if glState.clearStencil != clearStencil
     glState.clearStencil = clearStencil
     webGL.clearStencil(clearStencil)
@@ -124,18 +124,25 @@ bindAttributeBuffer = (name, size, stride, offset, data) ->
   # size - type包含的unit个数 针对传入的Buffer
   # stride - 以byte数为单位的数据块
   # offset - 以byte数为单位的数据偏移
-  varInfo = shader._attributeMap[name]
+  varInfo = glState.nowShader._attributeMap[name]
   if not varInfo
     console.error("Attribute not found <#{name}>.")
     return
   webGL.enableVertexAttribArray(varInfo.location)
   webGL.bindBuffer(webGL.ARRAY_BUFFER, data._hVertex)
-  webGL.vertexAttribPointer(varInfo.location, size, varInfo.typeCode, false, stride, offset)
+  webGL.vertexAttribPointer(
+    varInfo.location,
+    size,
+    varInfo.typeInfo.typeCode,
+    false,
+    stride * varInfo.typeInfo.unitBytes,
+    offset * varInfo.typeInfo.unitBytes
+  )
   webGL.bindBuffer(webGL.ARRAY_BUFFER, null)
   return
 
 bindAttributeConst = (name, data) ->
-  varInfo = shader._attributeMap[name]
+  varInfo = glState.nowShader._attributeMap[name]
   if not varInfo
     console.error("Attribute not found <#{name}>.")
     return
@@ -156,7 +163,7 @@ bindAttributeConst = (name, data) ->
   return
 
 bindUniform = (name, data) ->
-  varInfo = shader._uniformMap[name]
+  varInfo = glState.nowShader._uniformMap[name]
   if not varInfo
     console.error("Uniform not found <#{name}>.")
     return
@@ -215,6 +222,7 @@ bindUniform = (name, data) ->
   return
 
 drawCall = (param) ->
+  ###
   viewPortOx = param.viewPortOx ? 0
   viewPortOy = param.viewPortOy ? 0
   viewPortWidth = param.viewPortWidth ? 0
@@ -243,6 +251,7 @@ drawCall = (param) ->
 
   lineWidth = param.lineWidth ? 1
   if glState.lineWidth != lineWidth
+    glState.lineWidth = lineWidth
     webGL.lineWidth(glState.lineWidth)
 
   cullEnable = param.cullEnable ? false
@@ -263,7 +272,7 @@ drawCall = (param) ->
     glState.cullFace = cullFace
     webGL.cullFace(glState.cullFace)
 
-  polygonOffsetEnable = glState.polygonOffsetEnable or false
+  polygonOffsetEnable = glState.polygonOffsetEnable ? false
   if glState.polygonOffsetEnable != polygonOffsetEnable
     glState.polygonOffsetEnable = polygonOffsetEnable
     if glState.polygonOffsetEnable
@@ -271,8 +280,8 @@ drawCall = (param) ->
     else
       webGL.disable(webGL.POLYGON_OFFSET_FILL)
 
-  polygonOffsetSlope = glState.polygonOffsetSlope or 0
-  polygonOffsetUnit = glState.polygonOffsetUnit or 0
+  polygonOffsetSlope = glState.polygonOffsetSlope ? 0
+  polygonOffsetUnit = glState.polygonOffsetUnit ? 0
   updateFlag =
     glState.polygonOffsetSlope != polygonOffsetSlope or
     glState.polygonOffsetUnit != polygonOffsetUnit
@@ -281,7 +290,7 @@ drawCall = (param) ->
     glState.polygonOffsetUnit = polygonOffsetUnit
     webGL.polygonOffset(glState.polygonOffsetSlope, glState.polygonOffsetUnit)
 
-  scissorEnable = glState.scissorEnable or false
+  scissorEnable = glState.scissorEnable ? false
   if glState.scissorEnable != scissorEnable
     glState.scissorEnable = scissorEnable
     if glState.scissorEnable
@@ -305,7 +314,7 @@ drawCall = (param) ->
     glState.scissorHeight = scissorHeight
     webGL.scissor(glState.scissorOx, glState.scissorOy, glState.scissorWidth, glState.scissorHeight)
 
-  stencilEnable = glState.stencilEnable or false
+  stencilEnable = glState.stencilEnable ? false
   if glState.stencilEnable != stencilEnable
     glState.stencilEnable = stencilEnable
     if glState.stencilEnable
@@ -313,13 +322,13 @@ drawCall = (param) ->
     else
       webGL.disable(webGL.STENCIL_TEST)
 
-  stencilFrontWriteMask = param.stencilFrontWriteMask or 0xFFFFFFFF
+  stencilFrontWriteMask = param.stencilFrontWriteMask ? 0xFFFFFFFF
   if glState.stencilMaskSeparate != stencilFrontWriteMask
     glState.stencilMaskSeparate = stencilFrontWriteMask
-    webGL.stencilMaskSeparate(glState.stencilMaskSeparate. webGL.FRONT)
+    webGL.stencilMaskSeparate(webGL.FRONT, glState.stencilMaskSeparate)
 
-  stencilFrontReadMask = glState.stencilFrontReadMask or 0xFFFFFFFF
-  stencilFrontRefValue = glState.stencilFrontRefValue or 0
+  stencilFrontReadMask = glState.stencilFrontReadMask ? 0xFFFFFFFF
+  stencilFrontRefValue = glState.stencilFrontRefValue ? 0
   stencilFrontFunc = glState.stencilFrontFunc or webGL.EQUAL
   updateFlag =
     glState.stencilFrontReadMask != stencilFrontReadMask or
@@ -331,9 +340,9 @@ drawCall = (param) ->
     glState.stencilFrontFunc = stencilFrontFunc
     webGL.stencilFuncSeparate(webGL.FRONT, glState.stencilFrontFunc, glState.stencilFrontRefValue, glState.stencilFrontReadMask)
 
-  stencilFrontOpFail = glState.stencilFrontOpFail or webGL.KEEP
-  stencilFrontOpZFail = glState.stencilFrontOpZFail or webGL.KEEP
-  stencilFrontOpPass = glState.stencilFrontOpPass or webGL.KEEP
+  stencilFrontOpFail = glState.stencilFrontOpFail ? webGL.KEEP
+  stencilFrontOpZFail = glState.stencilFrontOpZFail ? webGL.KEEP
+  stencilFrontOpPass = glState.stencilFrontOpPass ? webGL.KEEP
   updateFlag =
     glState.stencilFrontOpFail != stencilFrontOpFail or
     glState.stencilFrontOpZFail != stencilFrontOpZFail or
@@ -344,13 +353,13 @@ drawCall = (param) ->
     glState.stencilFrontOpPass = stencilFrontOpPass
     webGL.stencilOpSeparate(webGL.FRONT, glState.stencilFrontOpFail, glState.stencilFrontOpZFail, glState.stencilFrontOpPass)
 
-  stencilBackWriteMask = param.stencilBackWriteMask or 0xFFFFFFFF
+  stencilBackWriteMask = param.stencilBackWriteMask ? 0xFFFFFFFF
   if glState.stencilMaskSeparate != stencilBackWriteMask
     glState.stencilMaskSeparate = stencilBackWriteMask
-    webGL.stencilMaskSeparate(glState.stencilMaskSeparate. webGL.BACK)
+    webGL.stencilMaskSeparate(webGL.BACK, glState.stencilMaskSeparate)
 
-  stencilBackReadMask = glState.stencilBackReadMask or 0xFFFFFFFF
-  stencilBackRefValue = glState.stencilBackRefValue or 0
+  stencilBackReadMask = glState.stencilBackReadMask ? 0xFFFFFFFF
+  stencilBackRefValue = glState.stencilBackRefValue ? 0
   stencilBackFunc = glState.stencilBackFunc or webGL.EQUAL
   updateFlag =
     glState.stencilBackReadMask != stencilBackReadMask or
@@ -362,9 +371,9 @@ drawCall = (param) ->
     glState.stencilBackFunc = stencilBackFunc
     webGL.stencilFuncSeparate(webGL.BACK, glState.stencilBackFunc, glState.stencilBackRefValue, glState.stencilBackReadMask)
 
-  stencilBackOptFail = glState.stencilBackOptFail or webGL.KEEP
-  stencilBackOptZFail = glState.stencilBackOptZFail or webGL.KEEP
-  stencilBackOptPass = glState.stencilBackOptPass or webGL.KEEP
+  stencilBackOptFail = glState.stencilBackOptFail ? webGL.KEEP
+  stencilBackOptZFail = glState.stencilBackOptZFail ? webGL.KEEP
+  stencilBackOptPass = glState.stencilBackOptPass ? webGL.KEEP
   updateFlag =
     glState.stencilBackOptFail != stencilBackOptFail or
     glState.stencilBackOptZFail != stencilBackOptZFail or
@@ -373,9 +382,9 @@ drawCall = (param) ->
     glState.stencilBackOptFail = stencilBackOptFail
     glState.stencilBackOptZFail = stencilBackOptZFail
     glState.stencilBackOptPass = stencilBackOptPass
-    webGL.stencilOptSeparate(webGL.BACK, glState.stencilBackOptFail, glState.stencilBackOptZFail, glState.stencilBackOptPass)
+    webGL.stencilOpSeparate(webGL.BACK, glState.stencilBackOptFail, glState.stencilBackOptZFail, glState.stencilBackOptPass)
 
-  depthEnable = glState.depthEnable or false
+  depthEnable = glState.depthEnable ? false
   if glState.depthEnable != depthEnable
     glState.depthEnable = depthEnable
     if glState.depthEnable
@@ -383,17 +392,17 @@ drawCall = (param) ->
     else
       webGL.disable(webGL.DEPTH_TEST)
 
-  depthMask = glState.depthMask or false
+  depthMask = glState.depthMask ? false
   if glState.depthMask != depthMask
     glState.depthMask = depthMask
     webGL.depthMask(glState.depthMask)
 
-  depthFunc = glState.depthFunc or webGL.LESS
+  depthFunc = glState.depthFunc ? webGL.LESS
   if glState.depthFunc != depthFunc
     glState.depthFunc = depthFunc
     webGL.depthFunc(glState.depthFunc)
 
-  blendEnable = glState.blendEnable or false
+  blendEnable = glState.blendEnable ? false
   if glState.blendEnable != blendEnable
     glState.blendEnable = blendEnable
     if glState.blendEnable
@@ -401,10 +410,10 @@ drawCall = (param) ->
     else
       webGL.disable(webGL.BLEND)
 
-  blendRefRed = glState.blendRefRed or 0
-  blendRefGreen = glState.blendRefGreen or 0
-  blendRefBlue = glState.blendRefBlue or 0
-  blendRefAlpha = glState.blendRefAlpha or 0
+  blendRefRed = glState.blendRefRed ? 0
+  blendRefGreen = glState.blendRefGreen ? 0
+  blendRefBlue = glState.blendRefBlue ? 0
+  blendRefAlpha = glState.blendRefAlpha ? 0
   updateFlag =
     glState.blendRefRed != blendRefRed or
     glState.blendRefGreen != blendRefGreen or
@@ -417,10 +426,10 @@ drawCall = (param) ->
     glState.blendRefAlpha = blendRefAlpha
     webGL.blendColor(glState.blendRefRed, glState.blendRefGreen, glState.blendRefBlue, glState.blendRefAlpha)
 
-  blendSrcRGBFunc = glState.blendSrcRGBFunc or webGL.SRC_ALPHA
-  blendSrcAlphaFunc = glState.blendSrcAlphaFunc or webGL.SRC_ALPHA
-  blendDstRGBFunc = glState.blendDstRGBFunc or webGL.ONE_MINUS_SRC_ALPHA
-  blendDstAlphaFunc = glState.blendDstAlphaFunc or webGL.ONE_MINUS_SRC_ALPHA
+  blendSrcRGBFunc = glState.blendSrcRGBFunc ? webGL.SRC_ALPHA
+  blendSrcAlphaFunc = glState.blendSrcAlphaFunc ? webGL.SRC_ALPHA
+  blendDstRGBFunc = glState.blendDstRGBFunc ? webGL.ONE_MINUS_SRC_ALPHA
+  blendDstAlphaFunc = glState.blendDstAlphaFunc ? webGL.ONE_MINUS_SRC_ALPHA
   updateFlag =
     glState.blendSrcRGBFunc != blendSrcRGBFunc or
     glState.blendSrcAlphaFunc != blendSrcAlphaFunc or
@@ -433,8 +442,8 @@ drawCall = (param) ->
     glState.blendDstAlphaFunc = blendDstAlphaFunc
     webGL.blendFuncSeparate(glState.blendSrcRGBFunc, glState.blendSrcAlphaFunc, glState.blendDstRGBFunc, glState.blendDstAlphaFunc)
 
-  blendRGBOpt = glState.blendRGBOpt or webGL.FUNC_ADD
-  blendAlphaOpt = glState.blendAlphaOpt or webGL.FUNC_ADD
+  blendRGBOpt = glState.blendRGBOpt ? webGL.FUNC_ADD
+  blendAlphaOpt = glState.blendAlphaOpt ? webGL.FUNC_ADD
   updateFlag =
     glState.blendRGBOpt != blendRGBOpt or
     glState.blendAlphaOpt != blendAlphaOpt
@@ -443,10 +452,10 @@ drawCall = (param) ->
     glState.blendAlphaOpt = blendAlphaOpt
     webGL.blendEquationSeparate(glState.blendRGBOpt, glState.blendAlphaOpt)
 
-  colorMaskRed = glState.colorMaskRed or false
-  colorMaskGreen = glState.colorMaskGreen or false
-  colorMaskBlue = glState.colorMaskBlue or false
-  colorMaskAlpha = glState.colorMaskAlpha or false
+  colorMaskRed = glState.colorMaskRed ? false
+  colorMaskGreen = glState.colorMaskGreen ? false
+  colorMaskBlue = glState.colorMaskBlue ? false
+  colorMaskAlpha = glState.colorMaskAlpha ? false
   updateFlag =
     glState.colorMaskRed != colorMaskRed or
     glState.colorMaskGreen != colorMaskGreen or
@@ -459,18 +468,20 @@ drawCall = (param) ->
     glState.colorMaskAlpha = colorMaskAlpha
     webGL.colorMask(glState.colorMaskRed, glState.colorMaskGreen, glState.colorMaskBlue, glState.colorMaskAlpha)
 
-  ditherEnable = glState.ditherEnable or false
+  ditherEnable = glState.ditherEnable ? false
   if glState.ditherEnable != ditherEnable
     glState.ditherEnable = ditherEnable
     if glState.ditherEnable
       webGL.enable(webGL.DITHER)
     else
       webGL.disable(webGL.DITHER)
+  ###
 
   {shader} = param
   if not shader
     throw new Error("drawCall() Need a shader.")
   webGL.useProgram(shader._hShader)
+  glState.nowShader = shader
 
   {uniformArray} = param
   if not uniformArray
@@ -482,14 +493,14 @@ drawCall = (param) ->
   if not attributeArray
     throw new Error("drawCall() Need a attributeArray.")
   for {name, size, stride, offset, data} in attributeArray
-    bindAttribyteBuffer(name, size, stride, offset, data)
+    bindAttributeBuffer(name, size, stride, offset, data)
 
   {drawIndex, drawMode} = param
   if not drawIndex
-    webGL.drawArrrays(drawMode.glCode, 0, param.drawCount)
+    webGL.drawArrays(drawMode.glCode, 0, param.drawCount)
   else
     webGL.bindBuffer(webGL.ELEMENT_ARRAY_BUFFER, drawIndex._hIndex)
-    webGL.drawElements(drawMode.glCode, param.drawCount, drawIndex._type.glCode, 0)
+    webGL.drawElements(drawMode.glCode, param.drawCount, webGL.UNSIGNED_SHORT, 0)
     webGL.bindBuffer(webGL.ELEMENT_ARRAY_BUFFER, null)
 
   for idx in [0...nowTexture] by 1

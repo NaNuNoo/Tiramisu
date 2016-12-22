@@ -3,7 +3,6 @@
 # # # # # # # # # # # # # # # # # # # #
 
 return {
-  canvas: canvas
   webGL: webGL
 
   TextureFormat: TextureFormat

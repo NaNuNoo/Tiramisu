@@ -1,5 +1,5 @@
-rm ./_lib/lib.js
-echo "function createWebGLWrap(){" >> ./_lib/lib.js
+rm ./lib.js
+echo "function createWebGLWrap(argCanvas, argParam){" >> ./lib.js
 cat\
   ./_lib/basic.coffee\
   ./_lib/shader.coffee\
@@ -8,5 +8,5 @@ cat\
   ./_lib/texture.coffee\
   ./_lib/state.coffee\
   ./_lib/wrap.coffee\
-| coffee -c -s -b >> ./_lib/lib.js
-echo "};" >> ./_lib/lib.js
+| coffee -c -s -b >> ./lib.js
+echo "};" >> ./lib.js

@@ -51,7 +51,6 @@ BufferIdx = () ->
   @_hIndex = null
   @_usage = null # BufferUsage
   @_size = 0 # buffer size in bytes
-  @_type = null # IndexType
   return
 
 BufferIdx::getUsage = () ->
@@ -60,19 +59,10 @@ BufferIdx::getUsage = () ->
 BufferIdx::getSize = () ->
   return @_size
 
-BufferIdx::getType = () ->
-  return @_type
-
 createBufferIdx_Array = (array, usage) ->
   bufferIdx = new BufferIdx()
   bufferIdx._size = array.size
   bufferIdx._usage = usage
-  if array.constructor == Uint8Array
-    bufferIdx._type = IndexType.BYTE
-  else if array.constructor == Uint16Array
-    bufferIdx._type = IndexType.SHORT
-  else
-    throw new Error("Create BufferIdx ERR.")
   bufferIdx._hIndex = webGL.createBuffer()
   if not bufferIdx._hIndex
     throw new Error("Create BufferIdx ERR.")
@@ -85,7 +75,6 @@ createBufferIdx_Size = (size, type, usage) ->
   bufferIdx = new BufferIdx()
   bufferIdx._usage = usage
   bufferIdx._size = size
-  bufferIdx._type = type
   bufferIdx._hIndex = webGL.createBuffer()
   if not bufferIdx._hIndex
     throw new Error("Create BufferIdx ERR.")
@@ -100,7 +89,6 @@ destoryBufferIdx = (bufferIdx) ->
   bufferIdx._hIndex = null
   bufferIdx._usage = null
   bufferIdx._size = 0
-  bufferIdx._type = null
   return
 
 

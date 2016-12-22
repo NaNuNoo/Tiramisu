@@ -79,13 +79,13 @@ createShader = (vsCode, fsCode) ->
     for idx in [0...shader._uniformNum] by 1
       info = webGL.getActiveUniform(hShader, idx)
       location = webGL.getUniformLocation(hShader, info.name)
-      shader._uniformMap[info.name] = new ShaderVarInfo(info, location)
+      shader._uniformMap[info.name] = new GLSLVar(info, location)
 
     shader._attributeNum = webGL.getProgramParameter(hShader, webGL.ACTIVE_ATTRIBUTES)
     for idx in [0...shader._attributeNum] by 1
       info = webGL.getActiveAttrib(hShader, idx)
       location = webGL.getAttribLocation(hShader, info.name)
-      shader._attributeMap[info.name] = new ShaderVarInfo(info, location)
+      shader._attributeMap[info.name] = new GLSLVar(info, location)
 
     return resolve(shader)
 
