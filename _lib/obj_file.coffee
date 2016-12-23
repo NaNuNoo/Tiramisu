@@ -309,7 +309,7 @@ objFile = (text) ->
   ctx.idxBuf.length = ctx.idxBufLen
   return {
     vtxBuf: new Float32Array(ctx.vtxBuf)
-    idxBuf: new Uint32Array(ctx.idxBuf)
+    idxBuf: new Uint16Array(ctx.idxBuf)
     vertexStride: ctx.vertexStride
     textureStride: ctx.textureStride
     normalStride: ctx.normalStride
