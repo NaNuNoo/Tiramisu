@@ -11,19 +11,26 @@ void main() {
 
 FS_CODE = '''
 precision mediump float;
-uniform vec3 u_modelDiff;
-uniform vec3 u_envCol;
+uniform vec3 u_envLight;
 uniform vec3 u_paraDir;
 uniform vec3 u_paraDiff;
+uniform vec3 u_modelDiff;
 varying vec3 v_modelNorm;
-vec3 paraDiffuse() {
-  float dirDotNorm = dot(-u_paraDir, v_modelNorm);
+
+vec3 lightDiffuse(
+  in vec3 lightDir,
+  in vec3 lightDiff,
+  in vec3 modelNorm,
+  in vec3 modelDiff
+) {
+  float dirDotNorm = dot(-lightDir, modelNorm);
   dirDotNorm = clamp(dirDotNorm, 0.0, 1.0);
-  return dirDotNorm * u_paraDiff * u_modelDiff;
+  return dirDotNorm * modelDiff * lightDiff;
 }
+
 void main(){
-  vec3 diffCol = paraDiffuse();
-  gl_FragColor = vec4(diffCol + u_envCol, 1.0);
+  vec3 diffCol = lightDiffuse(u_paraDir, u_paraDiff, v_modelNorm, u_modelDiff);
+  gl_FragColor = vec4(diffCol + u_envLight, 1.0);
 }
 '''
 
@@ -32,7 +39,7 @@ glw = createWebGLWrap(canvas)
 
 Promise.all([
   glw.createShader(VS_CODE, FS_CODE)
-  glw.createBufferMesh_Obj("./special.obj")
+  glw.createBufferMesh_Obj("../_res/special.obj")
 ])
 .then (resArray) ->
   shader = resArray[0]
@@ -61,7 +68,7 @@ Promise.all([
     uniformArray: [
       {name: "u_worldMat", data: worldMat}
       {name: "u_modelDiff", data: objDiff}
-      {name: "u_envCol", data: envCol}
+      {name: "u_envLight", data: envCol}
       {name: "u_paraDir", data: paraDir}
       {name: "u_paraDiff", data: paraDiff}
     ]
