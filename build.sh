@@ -10,3 +10,4 @@ cat\
   ./_lib/wrap.coffee\
 | coffee -c -s -b >> ./lib.js
 echo "};" >> ./lib.js
+coffee -c ./$1

@@ -222,11 +222,10 @@ bindUniform = (name, data) ->
   return
 
 drawCall = (param) ->
-  ###
   viewPortOx = param.viewPortOx ? 0
   viewPortOy = param.viewPortOy ? 0
-  viewPortWidth = param.viewPortWidth ? 0
-  viewPortHeight = param.viewPortHeight ? 0
+  viewPortWidth = param.viewPortWidth ? webGL.drawingBufferWidth
+  viewPortHeight = param.viewPortHeight ? webGL.drawingBufferHeight
   updateFlag =
     glState.viewPortOx != viewPortOx or
     glState.viewPortOy != viewPortOy or
@@ -239,7 +238,7 @@ drawCall = (param) ->
     glState.viewPortHeight = viewPortHeight
     webGL.viewport(glState.viewPortOx, glState.viewPortOy, glState.viewPortWidth, glState.viewPortHeight)
 
-  viewPortNear = param.viewPortNear ? 0
+  viewPortNear = param.viewPortNear ? -1
   viewPortFar = param.viewPortFar ? 1
   updateFlag =
     glState.viewPortNear != viewPortNear or
@@ -254,7 +253,7 @@ drawCall = (param) ->
     glState.lineWidth = lineWidth
     webGL.lineWidth(glState.lineWidth)
 
-  cullEnable = param.cullEnable ? false
+  cullEnable = param.cullEnable ? true
   if glState.cullEnable != cullEnable
     glState.cullEnable = cullEnable
     if glState.cullEnable
@@ -290,6 +289,7 @@ drawCall = (param) ->
     glState.polygonOffsetUnit = polygonOffsetUnit
     webGL.polygonOffset(glState.polygonOffsetSlope, glState.polygonOffsetUnit)
 
+  ###
   scissorEnable = glState.scissorEnable ? false
   if glState.scissorEnable != scissorEnable
     glState.scissorEnable = scissorEnable
@@ -313,6 +313,7 @@ drawCall = (param) ->
     glState.scissorWidth = scissorWidth
     glState.scissorHeight = scissorHeight
     webGL.scissor(glState.scissorOx, glState.scissorOy, glState.scissorWidth, glState.scissorHeight)
+  ###
 
   stencilEnable = glState.stencilEnable ? false
   if glState.stencilEnable != stencilEnable
@@ -384,7 +385,7 @@ drawCall = (param) ->
     glState.stencilBackOptPass = stencilBackOptPass
     webGL.stencilOpSeparate(webGL.BACK, glState.stencilBackOptFail, glState.stencilBackOptZFail, glState.stencilBackOptPass)
 
-  depthEnable = glState.depthEnable ? false
+  depthEnable = glState.depthEnable ? true
   if glState.depthEnable != depthEnable
     glState.depthEnable = depthEnable
     if glState.depthEnable
@@ -392,7 +393,7 @@ drawCall = (param) ->
     else
       webGL.disable(webGL.DEPTH_TEST)
 
-  depthMask = glState.depthMask ? false
+  depthMask = glState.depthMask ? true
   if glState.depthMask != depthMask
     glState.depthMask = depthMask
     webGL.depthMask(glState.depthMask)
@@ -401,7 +402,7 @@ drawCall = (param) ->
   if glState.depthFunc != depthFunc
     glState.depthFunc = depthFunc
     webGL.depthFunc(glState.depthFunc)
-
+  ###
   blendEnable = glState.blendEnable ? false
   if glState.blendEnable != blendEnable
     glState.blendEnable = blendEnable
@@ -452,10 +453,10 @@ drawCall = (param) ->
     glState.blendAlphaOpt = blendAlphaOpt
     webGL.blendEquationSeparate(glState.blendRGBOpt, glState.blendAlphaOpt)
 
-  colorMaskRed = glState.colorMaskRed ? false
-  colorMaskGreen = glState.colorMaskGreen ? false
-  colorMaskBlue = glState.colorMaskBlue ? false
-  colorMaskAlpha = glState.colorMaskAlpha ? false
+  colorMaskRed = glState.colorMaskRed ? true
+  colorMaskGreen = glState.colorMaskGreen ? true
+  colorMaskBlue = glState.colorMaskBlue ? true
+  colorMaskAlpha = glState.colorMaskAlpha ? true
   updateFlag =
     glState.colorMaskRed != colorMaskRed or
     glState.colorMaskGreen != colorMaskGreen or

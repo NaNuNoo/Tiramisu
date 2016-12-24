@@ -99,7 +99,11 @@ BufferMesh = () ->
   @_vertexStride = 0
   @_textureStride = 0
   @_normalStride = 0
+  @_indexLength = 0
   return
+
+BufferMesh::getIndexLength = () ->
+  return @_indexLength
 
 xhrPromise = (url) ->
   return new Promise (resolve, reject) ->
@@ -121,6 +125,7 @@ createBufferMesh_Obj = (url) ->
       bufferMesh._vertexStride = objData.vertexStride
       bufferMesh._textureStride = objData.textureStride
       bufferMesh._normalStride = objData.normalStride
+      bufferMesh._indexLength = objData.idxBuf.length
       # vertex buffer
       bufferMesh._hVertex = webGL.createBuffer()
       if not bufferMesh._hVertex
@@ -145,6 +150,8 @@ destoryBufferMesh = (bufferMesh) ->
     webGL.deleteBuffer(bufferMesh._hIndex)
   bufferMesh._hIndex = null
   bufferMesh._usage = BufferUsage.STATIC
-  bufferMesh._vertexStride = false
-  bufferMesh._textureStride = false
-  bufferMesh._normalStride = false
+  bufferMesh._vertexStride = 0
+  bufferMesh._textureStride = 0
+  bufferMesh._normalStride = 0
+  bufferMesh._indexLength = 0
+  return

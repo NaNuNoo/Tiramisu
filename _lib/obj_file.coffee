@@ -188,9 +188,8 @@ writeIndex = (ctx, idxText) ->
     ctx.vtxBuf = new Array(ctx.totalStride * 512)
     ctx.idxBuf = new Array(4 * 512)
   # 重复的idx不再写入
-  idx = ctx.idxMap[idxText]
-  if 'number' == typeof(idx)
-    ctx.idxBuf[ctx.idxBufLen++] = idx
+  if idxText in ctx.idxMap
+    ctx.idxBuf[ctx.idxBufLen++] = ctx.idxMap[idxText]
     return
   # 解析新的idx
   ptr = 0
@@ -277,6 +276,10 @@ objFile = (text) ->
         writeIndex(ctx, idxText)
         ptr = ignoreLine(text, ptr)
       when '#'
+        ptr = ignoreLine(text, ptr)
+      when 'g'
+        ptr = ptr + 1
+        ptr = ignoreSpace(text, ptr)
         ptr = ignoreLine(text, ptr)
       when 'o'
         ptr = ptr + 1
