@@ -2,29 +2,30 @@
 (function() {
   var FS_CODE, VS_CODE, canvas, glw;
 
-  VS_CODE = 'uniform mat4 u_mvpMat;      // MVP矩阵（设备空间）\nuniform mat4 u_mvMat;       // MV矩阵（世界空间）\n\nattribute vec3 a_modelPos;  // 模型位置（模型空间）\nattribute vec3 a_modelNorm; // 模型法线（模型空间）\n\nvarying vec3 v_modelPos;    // 模型位置（世界空间）\nvarying vec3 v_modelNorm;   // 模型法线（世界空间）\n\nvoid main() {\n  gl_Position = u_mvpMat * vec4(a_modelPos, 1.0);\n  v_modelPos = (u_mvpMat * vec4(a_modelPos, 1.0)).xyz;\n  v_modelNorm = a_modelNorm;\n}';
+  VS_CODE = 'uniform mat4 u_mvpMat;      // MVP矩阵（设备空间）\nuniform mat4 u_mvMat;       // MV矩阵（世界空间）\n\nattribute vec3 a_modelPos;  // 模型位置（模型空间）\nattribute vec3 a_modelNorm; // 模型法线（模型空间）\n\nvarying vec3 v_modelPos;    // 模型位置（世界空间）\nvarying vec3 v_modelNorm;   // 模型法线（世界空间）\n\nvoid main() {\n  gl_Position = u_mvpMat * vec4(a_modelPos, 1.0);\n  v_modelPos = (u_mvMat * vec4(a_modelPos, 1.0)).xyz;\n  v_modelNorm = a_modelNorm;\n}';
 
-  FS_CODE = 'precision mediump float;\n\nuniform vec3 u_lightEnv;    // 环境光颜色\n\nuniform vec3 u_paraDir;     // 平行光源方向\nuniform vec3 u_paraDiff;    // 平行光源漫反射颜色\nuniform vec3 u_paraSpec;    // 平行光源镜面反射颜色\n\nuniform float u_eyePos;     // 摄像机位置（世界空间）\n\nuniform vec3 u_modelDiff;   // 模型漫反射颜色\nuniform vec3 u_modelSpec;   // 模型镜面反射颜色\nuniform float u_modelGloss; // 模型光滑度\n\nvarying vec3 v_modelPos;    // 模型位置（世界空间）\nvarying vec3 v_modelNorm;   // 模型法线（世界空间）\n\nvec3 lightDiffuse(\n  in vec3 lightDir,\n  in vec3 lightDiff,\n  in vec3 modelNorm,\n  in vec3 modelDiff\n) {\n  float dirDotNorm = clamp(dot(-lightDir, modelNorm), 0.0, 1.0);\n  return dirDotNorm * lightDir * lightDiff;\n}\n\nvec3 lightSpecular(\n  in vec3 lightDir,\n  in vec3 lightSpec,\n  in vec3 eyePos,\n  in vec3 modelPos,\n  in vec3 modelNorm,\n  in vec3 modelSpec,\n  int float modelGloss\n) {\n  vec3 eyeVec = eyePos - modelPos;\n  vec3 halfVec = normalize(lightDir + eyeVec);\n  vec3 halfDotNorm = clamp(dot(halfVec, modelNorm), 0.0, 1.0);\n  return halfDotNorm * lightDir * lightDiff;\n}\n\nvoid main(){\n  vec3 diffCol = lightDiffuse(\n    u_paraDir, u_paraDiff,\n    v_modelNorm, u_modelDiff\n  );\n  vec3 specCol = lightSpecular(\n    u_paraDir, u_paraSpec,\n    u_eyePos, v_modelPos, v_modelNorm,\n    u_modelSpec, u_modelGloss\n  );\n  gl_FragColor = vec4(diffCol + u_lightEnv, 1.0);\n}';
+  FS_CODE = 'precision mediump float;\n\nuniform vec3 u_lightEnv;    // 环境光颜色\n\nuniform vec3 u_paraDir;     // 平行光源方向\nuniform vec3 u_paraDiff;    // 平行光源漫反射颜色\nuniform vec3 u_paraSpec;    // 平行光源镜面反射颜色\n\nuniform vec3 u_eyePos;     // 摄像机位置（世界空间）\n\nuniform vec3 u_modelDiff;   // 模型漫反射颜色\nuniform vec3 u_modelSpec;   // 模型镜面反射颜色\nuniform float u_modelGloss; // 模型光滑度\n\nvarying vec3 v_modelPos;    // 模型位置（世界空间）\nvarying vec3 v_modelNorm;   // 模型法线（世界空间）\n\nvec3 lightDiffuse(\n  in vec3 lightDir,\n  in vec3 lightDiff,\n  in vec3 modelNorm,\n  in vec3 modelDiff\n) {\n  float dirDotNorm = dot(-lightDir, modelNorm);\n  dirDotNorm = clamp(dirDotNorm, 0.0, 1.0);\n  return dirDotNorm * lightDiff * modelDiff;\n}\n\nvec3 lightSpecular(\n  in vec3 lightDir,\n  in vec3 lightSpec,\n  in vec3 eyePos,\n  in vec3 modelPos,\n  in vec3 modelNorm,\n  in vec3 modelSpec,\n  in float modelGloss\n) {\n  vec3 eyeVec = eyePos - modelPos;\n  vec3 halfVec = normalize(-lightDir + eyeVec);\n  float halfDotNorm = dot(halfVec, modelNorm);\n  halfDotNorm = clamp(halfDotNorm, 0.0, 1.0);\n  return pow(halfDotNorm, modelGloss) * lightSpec * lightSpec;\n}\n\nvoid main(){\n  vec3 diffCol = lightDiffuse(\n    u_paraDir, u_paraDiff,\n    v_modelNorm, u_modelDiff\n  );\n  vec3 specCol = lightSpecular(\n    u_paraDir, u_paraSpec,\n    u_eyePos, v_modelPos, v_modelNorm,\n    u_modelSpec, u_modelGloss\n  );\n  gl_FragColor = vec4(u_lightEnv + diffCol + specCol, 1.0);\n}';
 
   canvas = document.getElementById("gl-canvas");
 
   glw = createWebGLWrap(canvas);
 
-  Promise.all([glw.createShader(VS_CODE, FS_CODE), glw.createBufferMesh_Obj("./_res/special.obj")]).then(function(resArray) {
-    var clearParam, drawParam, lightEnv, mesh, modelDiff, modelMat, modelSpec, mvMat, mvpMat, paraDiff, paraDir, paraSpec, projMat, shader;
+  Promise.all([glw.createShader(VS_CODE, FS_CODE), glw.createBufferMesh_Obj("../_res/sphere.obj")]).then(function(resArray) {
+    var animeTick, clearParam, drawParam, eyePos, lightEnv, mesh, modelDiff, modelGloss, modelMat, modelSpec, mvMat, mvpMat, paraDiff, paraDir, paraSpec, projMat, shader;
     shader = resArray[0];
     mesh = resArray[1];
-    modelMat = modelMat.fromRotationTranslationScale(mat4.create(), [1, 0, 0, 0], [0, 0, 0], [100, 100, 100]);
+    modelMat = mat4.fromScaling(mat4.create(), [100, 100, 100]);
     projMat = mat4.ortho(mat4.create(), -512, 512, -288, 288, -500, 500);
     mvMat = mat4.copy(mat4.create(), modelMat);
     mvpMat = mat4.multiply(mat4.create(), projMat, modelMat);
     lightEnv = vec3.fromValues(0.6, 0.6, 0.6);
-    paraDir = vec3.fromValues(M.SQRT2_2, -M.SQRT2_2, 0);
+    paraDir = vec3.fromValues(-M.SQRT3_3, -M.SQRT3_3, -M.SQRT3_3);
     paraDiff = vec3.fromValues(0.3, 0.3, 0.3);
-    paraSpec = vec3.fromValues(0.3, 0.3, 0.3);
+    paraSpec = vec3.fromValues(0.5, 0.5, 0.5);
+    eyePos = vec3.fromValues(0, 0, 500);
     modelDiff = vec3.fromValues(1, 1, 1);
     modelSpec = vec3.fromValues(1, 1, 1);
-    model;
+    modelGloss = 20;
     clearParam = {
       clearColorRed: 0.92,
       clearColorGreen: 0.92,
@@ -37,19 +38,34 @@
       uniformArray: [
         {
           name: "u_mvpMat",
-          data: worldMat
+          data: mvpMat
         }, {
-          name: "u_modelDiff",
-          data: modelDiff
+          name: "u_mvMat",
+          data: mvMat
         }, {
           name: "u_lightEnv",
-          data: envCol
+          data: lightEnv
         }, {
           name: "u_paraDir",
           data: paraDir
         }, {
           name: "u_paraDiff",
           data: paraDiff
+        }, {
+          name: "u_paraSpec",
+          data: paraSpec
+        }, {
+          name: "u_eyePos",
+          data: eyePos
+        }, {
+          name: "u_modelDiff",
+          data: modelDiff
+        }, {
+          name: "u_modelSpec",
+          data: modelSpec
+        }, {
+          name: "u_modelGloss",
+          data: modelGloss
         }
       ],
       attributeArray: [
@@ -71,8 +87,11 @@
       drawMode: glw.DrawMode.TRIANGLES,
       drawCount: mesh.getIndexLength()
     };
-    glw.clearFrame(clearParam);
-    return glw.drawCall(drawParam);
+    animeTick = function() {
+      glw.clearFrame(clearParam);
+      return glw.drawCall(drawParam);
+    };
+    return util.updateAnime(animeTick);
   })["catch"](function(err) {
     return console.log(err);
   });
