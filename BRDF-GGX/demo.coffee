@@ -90,6 +90,7 @@ float GeometryTerm(
   float gl = normDotLightW + sqrt(alphaPow2 + (C_1 - alphaPow2) * pow2(normDotViewW));
   float gv = normDotViewW + sqrt(alphaPow2 + (C_1 - alphaPow2) * pow2(normDotLightW));
   return 0.5 / max(gl + gv, C_EPSILON);
+  //return 0.5 / gl * gv;
 }
 
 // BRDF D项 分布项
@@ -161,32 +162,17 @@ void main() {
 '''
 
 canvas = document.getElementById("gl-canvas")
-glw = createWebGLWrap(canvas)
+glw = createWebGLWrap(canvas, {
+  antialias: true
+})
 
 Promise.all([
   glw.createShader(VS_CODE, FS_CODE)
-  glw.createBufferMesh_Obj("../_res/sphere-2.obj")
+  glw.createBufferMesh_Obj("../_res/sphere-12.obj")
 ])
 .then (resArray) ->
   shader = resArray[0]
   mesh = resArray[1]
-
-  #modelMat = mat4.fromRotationTranslationScale(mat4.create(), [1,0,0,0], [100,100,0], [100,100,100])
-  modelMat = mat4.fromScaling(mat4.create(), [50,50,50])
-  projMat = mat4.ortho(mat4.create(), -512, 512, -288, 288, -500, 500)
-  mvMat = mat4.copy(mat4.create(), modelMat)
-  mvpMat = mat4.multiply(mat4.create(), projMat, modelMat)
-
-  lightEnv = vec3.fromValues(0.5, 0.5, 0.5)
-
-  paraDir = vec3.fromValues(-M.SQRT3_3, -M.SQRT3_3, -M.SQRT3_3)
-  paraCol = vec3.fromValues(0.5, 0.5, 0.5)
-
-  viewPos = vec3.fromValues(0, 0, 200)
-
-  objAlbedo = vec3.fromValues(0.7, 0.45, 0.4)
-  objMetalness = 0.1
-  objRoughness = 0.2
 
   clearParam = {
     clearColorRed: 0.92
@@ -196,31 +182,53 @@ Promise.all([
     clearDepth: 1.0
   }
 
-  drawParam = {
-    shader: shader
-    uniformArray: [
-      {name: "u_mvpMat", data: mvpMat}
-      {name: "u_mvMat", data: mvMat}
-      {name: "u_envCol", data: lightEnv}
-      {name: "u_paraDirW", data: paraDir}
-      {name: "u_paraCol", data: paraCol}
-      {name: "u_viewPosW", data: viewPos}
-      {name: "u_objAlbedo", data: objAlbedo}
-      {name: "u_objMetalness", data: objMetalness}
-      {name: "u_objRoughness", data: objRoughness}
-    ]
-    attributeArray: [
-      {name: "a_objPosM", size: 3, stride: 6, offset: 0, data: mesh}
-      {name: "a_objNormM", size: 3, stride: 6, offset: 3, data: mesh}
-    ]
-    drawIndex: mesh
-    drawMode: glw.DrawMode.TRIANGLES
-    drawCount: mesh.getIndexLength()
-  }
+  lightEnv = vec3.fromValues(0.6, 0.6, 0.6)
+
+  paraDir = vec3.fromValues(-M.SQRT3_3, -M.SQRT3_3, -M.SQRT3_3)
+  paraCol = vec3.fromValues(0.7, 0.7, 0.7)
+
+  viewPos = vec3.fromValues(0, 0, 500)
+
+  objAlbedo = vec3.fromValues(159/255, 164/255, 174/255)
+  drawParamArray = []
+  for ii in [0...9]
+    for jj in [0...9]
+      objMetalness = 0.0 + (ii + 1) / 10
+      objRoughness = 1.0 - (jj + 1) / 10
+
+      moveMat = mat4.fromTranslation(mat4.create(), [-240+ii*60, -240+jj*60 ,0])
+      scaleMat = mat4.fromScaling(mat4.create(), [22,22,22])
+      modelMat = mat4.multiply(mat4.create(), moveMat, scaleMat)
+      projMat = mat4.ortho(mat4.create(), -512, 512, -288, 288, -500, 500)
+      mvMat = mat4.copy(mat4.create(), modelMat)
+      mvpMat = mat4.multiply(mat4.create(), projMat, modelMat)
+
+      drawParamArray.push {
+        shader: shader
+        uniformArray: [
+          {name: "u_mvpMat", data: mvpMat}
+          {name: "u_mvMat", data: mvMat}
+          {name: "u_envCol", data: lightEnv}
+          {name: "u_paraDirW", data: paraDir}
+          {name: "u_paraCol", data: paraCol}
+          {name: "u_viewPosW", data: viewPos}
+          {name: "u_objAlbedo", data: objAlbedo}
+          {name: "u_objMetalness", data: objMetalness}
+          {name: "u_objRoughness", data: objRoughness}
+        ]
+        attributeArray: [
+          {name: "a_objPosM", size: 3, stride: 6, offset: 0, data: mesh}
+          {name: "a_objNormM", size: 3, stride: 6, offset: 3, data: mesh}
+        ]
+        drawIndex: mesh
+        drawMode: glw.DrawMode.TRIANGLES
+        drawCount: mesh.getIndexLength()
+      }
 
   animeTick = () ->
     glw.clearFrame(clearParam)
-    glw.drawCall(drawParam)
+    for drawParam in drawParamArray
+      glw.drawCall(drawParam)
   util.updateAnime(animeTick)
 .catch (err) ->
   console.log(err)
