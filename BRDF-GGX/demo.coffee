@@ -34,6 +34,13 @@ float pow2(const in float a) { return a * a; }
 float pow3(const in float a) { return a * a * a; }
 float pow4(const in float a) { float b = a * a; return b * b; }
 
+const float GAMMA_IN = 2.2;
+vec3 gammaIn(const in vec3 c) { return pow(c, vec3(GAMMA_IN)); }
+vec4 gammaIn(const in vec4 c) { return pow(c, vec4(GAMMA_IN)); }
+const float GAMMA_OUT = 1.0 / GAMMA_IN;
+vec3 gammaOut(const in vec3 c) { return pow(c, vec3(GAMMA_OUT)); }
+vec4 gammaOut(const in vec4 c) { return pow(c, vec4(GAMMA_OUT)); }
+
 uniform vec3 u_envCol;        // 环境光颜色
 
 uniform vec3 u_paraDirW;      // 平行光源方向
@@ -90,7 +97,7 @@ float GeometryTerm(
   float gl = normDotLightW + sqrt(alphaPow2 + (C_1 - alphaPow2) * pow2(normDotViewW));
   float gv = normDotViewW + sqrt(alphaPow2 + (C_1 - alphaPow2) * pow2(normDotLightW));
   return 0.5 / max(gl + gv, C_EPSILON);
-  //return 0.5 / gl * gv;
+  //return 1.0 / gl * gv;
 }
 
 // BRDF D项 分布项
@@ -157,7 +164,8 @@ void main() {
     u_paraCol, objDiff, objSpec, u_objRoughness
   );
 
-  gl_FragColor = vec4(envCol + paraCol, 1.0);
+  vec4 linearCol = vec4(envCol + paraCol, 1.0);
+  gl_FragColor = gammaOut(linearCol);
 }
 '''
 
@@ -189,7 +197,7 @@ Promise.all([
 
   viewPos = vec3.fromValues(0, 0, 500)
 
-  objAlbedo = vec3.fromValues(159/255, 164/255, 174/255)
+  objAlbedo = vec3.fromValues(0.955, 0.638, 0.535)
   drawParamArray = []
   for ii in [0...9]
     for jj in [0...9]
