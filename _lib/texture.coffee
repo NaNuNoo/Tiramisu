@@ -31,20 +31,20 @@ createTexture2DHelper = (isImageObj) ->
     height = arguments[2]
     param = arguments[3] or {}
   texture2D = new Texture2D()
-  texture2D._format = param.format or TextureFormat.RGBA
-  texture2D._wrapS = param.wrapS or TextureWrap.EDGE
-  texture2D._wrapT = param.wrapT or TextureWrap.EDGE
-  texture2D._magFilter = param.magFilter or TextureFilter.LINEAR
-  texture2D._minFilter = param.minFilter or TextureFilter.LINEAR
+  texture2D._format = param.format ? TextureFormat.R8G8B8A8
+  texture2D._wrapS = param.wrapS ? TextureWrap.EDGE
+  texture2D._wrapT = param.wrapT ? TextureWrap.EDGE
+  texture2D._magFilter = param.magFilter ? TextureFilter.LINEAR
+  texture2D._minFilter = param.minFilter ? TextureFilter.LINEAR
   texture2D._hTexture = webGL.createTexture()
   if not texture._hTexture
       return null
   webGL.bindTexture(webGL.TEXTURE_2D, texture2D._hTexture)
   {glMemory, glFormat} = texture2D._format
   if isImageObj
-    webGL.texImage2D(webGL.TEXTURE_2D, 0, glMemory, glFormat, glMemory, image)
+    webGL.texImage2D(webGL.TEXTURE_2D, 0, glFormat, glFormat, glMemory, image)
   else
-    webGL.texImage2D(webGL.TEXTURE_2D, 0, width, height, 0, glMemory, glFormat, glMemory, null)
+    webGL.texImage2D(webGL.TEXTURE_2D, 0, width, height, 0, glFormat, glFormat, glMemory, null)
   webGL.texParameteri(webGL.TEXTURE_2D, webGL.TEXTURE_WRAP_S, texture2D._wrapS.glCode)
   webGL.texParameteri(webGL.TEXTURE_2D, webGL.TEXTURE_WRAP_T, texture2D._wrapT.glCode)
   webGL.texParameteri(webGL.TEXTURE_2D, webGL.TEXTURE_MAG_FILTER, texture2D._magFilter.glCode)
@@ -110,34 +110,34 @@ createTextureCubeHelper = (isImageObj) ->
     height = arguments[2]
     param = arguments[3] or {}
   textureCube = new TextureCube()
-  texture2D._format = param.format or TextureFormat.RGBA
-  texture2D._wrapS = param.wrapS or TextureWrap.EDGE
-  texture2D._wrapT = param.wrapT or TextureWrap.EDGE
-  texture2D._magFilter = param.magFilter or TextureFilter.LINEAR
-  texture2D._minFilter = param.minFilter or TextureFilter.LINEAR
+  textureCube._format = param.format ? TextureFormat.R8G8B8
+  textureCube._wrapS = param.wrapS ? TextureWrap.EDGE
+  textureCube._wrapT = param.wrapT ? TextureWrap.EDGE
+  textureCube._magFilter = param.magFilter ? TextureFilter.LINEAR
+  textureCube._minFilter = param.minFilter ? TextureFilter.LINEAR
   textureCube._hTexture = webGL.createTexture()
-  if not texture._hTexture
+  if not textureCube._hTexture
       return reject(new Error("Create textureCube ERR."))
   webGL.bindTexture(webGL.TEXTURE_CUBE_MAP, textureCube._hTexture)
-  {glMemory, glFormat} = texture2D._format
+  {glMemory, glFormat} = textureCube._format
   if isImageObj
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_X, 0, glMemory, glFormat, glMemory, imageArray[0])
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, glMemory, glFormat, glMemory, imageArray[1])
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, glMemory, glFormat, glMemory, imageArray[2])
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, glMemory, glFormat, glMemory, imageArray[3])
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, glMemory, glFormat, glMemory, imageArray[4])
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, glMemory, glFormat, glMemory, imageArray[5])
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_X, 0, glFormat, glFormat, glMemory, imageArray[0])
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, glFormat, glFormat, glMemory, imageArray[1])
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, glFormat, glFormat, glMemory, imageArray[2])
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, glFormat, glFormat, glMemory, imageArray[3])
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, glFormat, glFormat, glMemory, imageArray[4])
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, glFormat, glFormat, glMemory, imageArray[5])
   else
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_X, 0, width, height, 0, glMemory, glFormat, glMemory, null)
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, width, height, 0, glMemory, glFormat, glMemory, null)
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, width, height, 0, glMemory, glFormat, glMemory, null)
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, width, height, 0, glMemory, glFormat, glMemory, null)
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, width, height, 0, glMemory, glFormat, glMemory, null)
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, width, height, 0, glMemory, glFormat, glMemory, null)
-  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_WRAP_S, texture2D._wrapS.glCode)
-  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_WRAP_T, texture2D._wrapT.glCode)
-  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_MAG_FILTER, texture2D._magFilter.glCode)
-  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_MIN_FILTER, texture2D._minFilter.glCode)
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_X, 0, width, height, 0, glFormat, glFormat, glMemory, null)
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, width, height, 0, glFormat, glFormat, glMemory, null)
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, width, height, 0, glFormat, glFormat, glMemory, null)
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, width, height, 0, glFormat, glFormat, glMemory, null)
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, width, height, 0, glFormat, glFormat, glMemory, null)
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, width, height, 0, glFormat, glFormat, glMemory, null)
+  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_WRAP_S, textureCube._wrapS.glCode)
+  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_WRAP_T, textureCube._wrapT.glCode)
+  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_MAG_FILTER, textureCube._magFilter.glCode)
+  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_MIN_FILTER, textureCube._minFilter.glCode)
   webGL.bindTexture(webGL.TEXTURE_CUBE_MAP, null)
   return textureCube
 

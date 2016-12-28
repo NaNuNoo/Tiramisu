@@ -13,10 +13,10 @@ if not webGL
   return null
 
 
-TextureFormat = (name, glFormat, glMemeory) ->
+TextureFormat = (name, glFormat, glMemory) ->
   @name = name
   @glFormat = glFormat
-  @glMemeory = glMemeory
+  @glMemory = glMemory
   Object.freeze(this)
   return
 
@@ -154,7 +154,7 @@ GLSLType.fromGLType = (webGLType) ->
     when webGL.FLOAT_MAT3 then GLSLType.MAT3
     when webGL.FLOAT_MAT4 then GLSLType.MAT4
     when webGL.SAMPLER_2D then GLSLType.SAMPLER_2D
-    when webGL.SAMPLER_CUBE then GLSLType.SAMPLER_Cube
+    when webGL.SAMPLER_CUBE then GLSLType.SAMPLER_CUBE
     else null
 
 GLSLType.BOOL = new GLSLType(0, "bool", webGL.BOOL, 1, 1)

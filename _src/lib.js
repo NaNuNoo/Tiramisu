@@ -77,10 +77,10 @@ if (!webGL) {
   return null;
 }
 
-TextureFormat = function(name, glFormat, glMemeory) {
+TextureFormat = function(name, glFormat, glMemory) {
   this.name = name;
   this.glFormat = glFormat;
-  this.glMemeory = glMemeory;
+  this.glMemory = glMemory;
   Object.freeze(this);
 };
 
@@ -250,7 +250,7 @@ GLSLType.fromGLType = function(webGLType) {
     case webGL.SAMPLER_2D:
       return GLSLType.SAMPLER_2D;
     case webGL.SAMPLER_CUBE:
-      return GLSLType.SAMPLER_Cube;
+      return GLSLType.SAMPLER_CUBE;
     default:
       return null;
   }
@@ -1038,7 +1038,7 @@ Texture2D = function() {
 };
 
 createTexture2DHelper = function(isImageObj) {
-  var glFormat, glMemory, height, image, param, ref, texture2D, width;
+  var glFormat, glMemory, height, image, param, ref, ref1, ref2, ref3, ref4, ref5, texture2D, width;
   if (isImageObj) {
     image = arguments[1];
     param = arguments[2] || {};
@@ -1048,21 +1048,21 @@ createTexture2DHelper = function(isImageObj) {
     param = arguments[3] || {};
   }
   texture2D = new Texture2D();
-  texture2D._format = param.format || TextureFormat.RGBA;
-  texture2D._wrapS = param.wrapS || TextureWrap.EDGE;
-  texture2D._wrapT = param.wrapT || TextureWrap.EDGE;
-  texture2D._magFilter = param.magFilter || TextureFilter.LINEAR;
-  texture2D._minFilter = param.minFilter || TextureFilter.LINEAR;
+  texture2D._format = (ref = param.format) != null ? ref : TextureFormat.R8G8B8A8;
+  texture2D._wrapS = (ref1 = param.wrapS) != null ? ref1 : TextureWrap.EDGE;
+  texture2D._wrapT = (ref2 = param.wrapT) != null ? ref2 : TextureWrap.EDGE;
+  texture2D._magFilter = (ref3 = param.magFilter) != null ? ref3 : TextureFilter.LINEAR;
+  texture2D._minFilter = (ref4 = param.minFilter) != null ? ref4 : TextureFilter.LINEAR;
   texture2D._hTexture = webGL.createTexture();
   if (!texture._hTexture) {
     return null;
   }
   webGL.bindTexture(webGL.TEXTURE_2D, texture2D._hTexture);
-  ref = texture2D._format, glMemory = ref.glMemory, glFormat = ref.glFormat;
+  ref5 = texture2D._format, glMemory = ref5.glMemory, glFormat = ref5.glFormat;
   if (isImageObj) {
-    webGL.texImage2D(webGL.TEXTURE_2D, 0, glMemory, glFormat, glMemory, image);
+    webGL.texImage2D(webGL.TEXTURE_2D, 0, glFormat, glFormat, glMemory, image);
   } else {
-    webGL.texImage2D(webGL.TEXTURE_2D, 0, width, height, 0, glMemory, glFormat, glMemory, null);
+    webGL.texImage2D(webGL.TEXTURE_2D, 0, width, height, 0, glFormat, glFormat, glMemory, null);
   }
   webGL.texParameteri(webGL.TEXTURE_2D, webGL.TEXTURE_WRAP_S, texture2D._wrapS.glCode);
   webGL.texParameteri(webGL.TEXTURE_2D, webGL.TEXTURE_WRAP_T, texture2D._wrapT.glCode);
@@ -1132,7 +1132,7 @@ TextureCube = function() {
 };
 
 createTextureCubeHelper = function(isImageObj) {
-  var glFormat, glMemory, height, imageArray, param, ref, textureCube, width;
+  var glFormat, glMemory, height, imageArray, param, ref, ref1, ref2, ref3, ref4, ref5, textureCube, width;
   if (isImageObj) {
     imageArray = arguments[1];
     param = arguments[2] || {};
@@ -1142,36 +1142,36 @@ createTextureCubeHelper = function(isImageObj) {
     param = arguments[3] || {};
   }
   textureCube = new TextureCube();
-  texture2D._format = param.format || TextureFormat.RGBA;
-  texture2D._wrapS = param.wrapS || TextureWrap.EDGE;
-  texture2D._wrapT = param.wrapT || TextureWrap.EDGE;
-  texture2D._magFilter = param.magFilter || TextureFilter.LINEAR;
-  texture2D._minFilter = param.minFilter || TextureFilter.LINEAR;
+  textureCube._format = (ref = param.format) != null ? ref : TextureFormat.R8G8B8;
+  textureCube._wrapS = (ref1 = param.wrapS) != null ? ref1 : TextureWrap.EDGE;
+  textureCube._wrapT = (ref2 = param.wrapT) != null ? ref2 : TextureWrap.EDGE;
+  textureCube._magFilter = (ref3 = param.magFilter) != null ? ref3 : TextureFilter.LINEAR;
+  textureCube._minFilter = (ref4 = param.minFilter) != null ? ref4 : TextureFilter.LINEAR;
   textureCube._hTexture = webGL.createTexture();
-  if (!texture._hTexture) {
+  if (!textureCube._hTexture) {
     return reject(new Error("Create textureCube ERR."));
   }
   webGL.bindTexture(webGL.TEXTURE_CUBE_MAP, textureCube._hTexture);
-  ref = texture2D._format, glMemory = ref.glMemory, glFormat = ref.glFormat;
+  ref5 = textureCube._format, glMemory = ref5.glMemory, glFormat = ref5.glFormat;
   if (isImageObj) {
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_X, 0, glMemory, glFormat, glMemory, imageArray[0]);
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, glMemory, glFormat, glMemory, imageArray[1]);
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, glMemory, glFormat, glMemory, imageArray[2]);
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, glMemory, glFormat, glMemory, imageArray[3]);
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, glMemory, glFormat, glMemory, imageArray[4]);
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, glMemory, glFormat, glMemory, imageArray[5]);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_X, 0, glFormat, glFormat, glMemory, imageArray[0]);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, glFormat, glFormat, glMemory, imageArray[1]);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, glFormat, glFormat, glMemory, imageArray[2]);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, glFormat, glFormat, glMemory, imageArray[3]);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, glFormat, glFormat, glMemory, imageArray[4]);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, glFormat, glFormat, glMemory, imageArray[5]);
   } else {
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_X, 0, width, height, 0, glMemory, glFormat, glMemory, null);
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, width, height, 0, glMemory, glFormat, glMemory, null);
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, width, height, 0, glMemory, glFormat, glMemory, null);
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, width, height, 0, glMemory, glFormat, glMemory, null);
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, width, height, 0, glMemory, glFormat, glMemory, null);
-    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, width, height, 0, glMemory, glFormat, glMemory, null);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_X, 0, width, height, 0, glFormat, glFormat, glMemory, null);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, width, height, 0, glFormat, glFormat, glMemory, null);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, width, height, 0, glFormat, glFormat, glMemory, null);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, width, height, 0, glFormat, glFormat, glMemory, null);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, width, height, 0, glFormat, glFormat, glMemory, null);
+    webGL.texImage2D(webGL.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, width, height, 0, glFormat, glFormat, glMemory, null);
   }
-  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_WRAP_S, texture2D._wrapS.glCode);
-  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_WRAP_T, texture2D._wrapT.glCode);
-  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_MAG_FILTER, texture2D._magFilter.glCode);
-  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_MIN_FILTER, texture2D._minFilter.glCode);
+  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_WRAP_S, textureCube._wrapS.glCode);
+  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_WRAP_T, textureCube._wrapT.glCode);
+  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_MAG_FILTER, textureCube._magFilter.glCode);
+  webGL.texParameteri(webGL.TEXTURE_CUBE_MAP, webGL.TEXTURE_MIN_FILTER, textureCube._minFilter.glCode);
   webGL.bindTexture(webGL.TEXTURE_CUBE_MAP, null);
   return textureCube;
 };
@@ -1367,7 +1367,7 @@ bindAttributeConst = function(name, data) {
 };
 
 bindUniform = function(name, data) {
-  var nowTexture, varInfo;
+  var varInfo;
   varInfo = glState.nowShader._uniformMap[name];
   if (!varInfo) {
     console.error("Uniform not found <" + name + ">.");
@@ -1432,16 +1432,16 @@ bindUniform = function(name, data) {
       webGL.uniformMatrix4fv(varInfo.location, false, data);
       break;
     case 15:
-      webGL.activeTexture(webGL.TEXTURE0 + nowTexture);
+      webGL.activeTexture(webGL.TEXTURE0 + glState.nowTexture);
       webGL.bindTexture(webGL.TEXTURE_2D, data._hTexture);
-      webGL.uniform1i(varInfo.location, nowTexture);
-      nowTexture = nowTexture + 1;
+      webGL.uniform1i(varInfo.location, glState.nowTexture);
+      glState.nowTexture = glState.nowTexture + 1;
       break;
     case 16:
-      webGL.activeTexture(webGL.TEXTURE0 + nowTexture);
+      webGL.activeTexture(webGL.TEXTURE0 + glState.nowTexture);
       webGL.bindTexture(webGL.TEXTURE_CUBE_MAP, data._hTexture);
-      webGL.uniform1i(varInfo.location, nowTexture);
-      nowTexture = nowTexture + 1;
+      webGL.uniform1i(varInfo.location, glState.nowTexture);
+      glState.nowTexture = glState.nowTexture + 1;
       break;
     default:
       console.error("Unknow uniform type.");
@@ -1449,7 +1449,7 @@ bindUniform = function(name, data) {
 };
 
 drawCall = function(param) {
-  var attributeArray, cullEnable, cullFace, cullFront, data, depthEnable, depthFunc, depthMask, drawIndex, drawMode, i, idx, j, k, len, len1, lineWidth, name, nowTexture, offset, polygonOffsetEnable, polygonOffsetSlope, polygonOffsetUnit, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref18, ref19, ref2, ref20, ref21, ref22, ref23, ref24, ref25, ref26, ref27, ref28, ref29, ref3, ref30, ref31, ref4, ref5, ref6, ref7, ref8, ref9, shader, size, stencilBackFunc, stencilBackOptFail, stencilBackOptPass, stencilBackOptZFail, stencilBackReadMask, stencilBackRefValue, stencilBackWriteMask, stencilEnable, stencilFrontFunc, stencilFrontOpFail, stencilFrontOpPass, stencilFrontOpZFail, stencilFrontReadMask, stencilFrontRefValue, stencilFrontWriteMask, stride, uniformArray, updateFlag, viewPortFar, viewPortHeight, viewPortNear, viewPortOx, viewPortOy, viewPortWidth;
+  var attributeArray, cullEnable, cullFace, cullFront, data, depthEnable, depthFunc, depthMask, drawIndex, drawMode, i, idx, j, k, len, len1, lineWidth, name, offset, polygonOffsetEnable, polygonOffsetSlope, polygonOffsetUnit, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref18, ref19, ref2, ref20, ref21, ref22, ref23, ref24, ref25, ref26, ref27, ref28, ref29, ref3, ref30, ref31, ref4, ref5, ref6, ref7, ref8, ref9, shader, size, stencilBackFunc, stencilBackOptFail, stencilBackOptPass, stencilBackOptZFail, stencilBackReadMask, stencilBackRefValue, stencilBackWriteMask, stencilEnable, stencilFrontFunc, stencilFrontOpFail, stencilFrontOpPass, stencilFrontOpZFail, stencilFrontReadMask, stencilFrontRefValue, stencilFrontWriteMask, stride, uniformArray, updateFlag, viewPortFar, viewPortHeight, viewPortNear, viewPortOx, viewPortOy, viewPortWidth;
   viewPortOx = (ref = param.viewPortOx) != null ? ref : 0;
   viewPortOy = (ref1 = param.viewPortOy) != null ? ref1 : 0;
   viewPortWidth = (ref2 = param.viewPortWidth) != null ? ref2 : webGL.drawingBufferWidth;
@@ -1721,12 +1721,12 @@ drawCall = function(param) {
     webGL.drawElements(drawMode.glCode, param.drawCount, webGL.UNSIGNED_SHORT, 0);
     webGL.bindBuffer(webGL.ELEMENT_ARRAY_BUFFER, null);
   }
-  for (idx = k = 0, ref31 = nowTexture; k < ref31; idx = k += 1) {
+  for (idx = k = 0, ref31 = glState.nowTexture; k < ref31; idx = k += 1) {
     webGL.activeTexture(webGL.TEXTURE0 + idx);
     webGL.bindTexture(webGL.TEXTURE_2D, null);
     webGL.bindTexture(webGL.TEXTURE_CUBE_MAP, null);
   }
-  nowTexture = 0;
+  glState.nowTexture = 0;
   webGL.useProgram(null);
 };
 

@@ -208,15 +208,15 @@ bindUniform = (name, data) ->
     when 14 # mat4
       webGL.uniformMatrix4fv(varInfo.location, false, data)
     when 15 # sampler2d
-      webGL.activeTexture(webGL.TEXTURE0 + nowTexture)
+      webGL.activeTexture(webGL.TEXTURE0 + glState.nowTexture)
       webGL.bindTexture(webGL.TEXTURE_2D, data._hTexture)
-      webGL.uniform1i(varInfo.location, nowTexture)
-      nowTexture = nowTexture + 1
+      webGL.uniform1i(varInfo.location, glState.nowTexture)
+      glState.nowTexture = glState.nowTexture + 1
     when 16 # samplerCube
-      webGL.activeTexture(webGL.TEXTURE0 + nowTexture)
+      webGL.activeTexture(webGL.TEXTURE0 + glState.nowTexture)
       webGL.bindTexture(webGL.TEXTURE_CUBE_MAP, data._hTexture)
-      webGL.uniform1i(varInfo.location, nowTexture)
-      nowTexture = nowTexture + 1
+      webGL.uniform1i(varInfo.location, glState.nowTexture)
+      glState.nowTexture = glState.nowTexture + 1
     else
       console.error("Unknow uniform type.")
   return
@@ -504,11 +504,11 @@ drawCall = (param) ->
     webGL.drawElements(drawMode.glCode, param.drawCount, webGL.UNSIGNED_SHORT, 0)
     webGL.bindBuffer(webGL.ELEMENT_ARRAY_BUFFER, null)
 
-  for idx in [0...nowTexture] by 1
+  for idx in [0...glState.nowTexture] by 1
     webGL.activeTexture(webGL.TEXTURE0 + idx)
     webGL.bindTexture(webGL.TEXTURE_2D, null)
     webGL.bindTexture(webGL.TEXTURE_CUBE_MAP, null)
-  nowTexture = 0
+  glState.nowTexture = 0
 
   webGL.useProgram(null)
   return
