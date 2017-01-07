@@ -34,7 +34,8 @@ StaticShader.create_VsFs = (vsCode, fsCode) ->
       if not hVertex
         console.error("Create shader ERR.")
         break
-      webGL.shaderSource(hVertex, vsCode)
+      realVsCode = joinVsCode(vsCode)
+      webGL.shaderSource(hVertex, realVsCode)
       webGL.compileShader(hVertex)
       if not webGL.getShaderParameter(hVertex, webGL.COMPILE_STATUS)
         infoLog = webGL.getShaderInfoLog(hVertex)
@@ -45,7 +46,8 @@ StaticShader.create_VsFs = (vsCode, fsCode) ->
       if not hFragment
         console.error("Create shader ERR.")
         break
-      webGL.shaderSource(hFragment, fsCode)
+      realFsCode = joinFsCode(fsCode)
+      webGL.shaderSource(hFragment, realFsCode)
       webGL.compileShader(hFragment)
       if not webGL.getShaderParameter(hFragment, webGL.COMPILE_STATUS)
         infoLog = webGL.getShaderInfoLog(hFragment)

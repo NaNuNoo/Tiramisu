@@ -5,6 +5,7 @@ cat \
   ./_Tiramisu/init.coffee \
   ./_Tiramisu/enum.coffee \
   ./_Tiramisu/util.coffee \
+  ./_Tiramisu/shader_lib.coffee \
   ./_Tiramisu/shader.coffee \
   ./_Tiramisu/texture.coffee \
   ./_Tiramisu/obj_file.coffee \

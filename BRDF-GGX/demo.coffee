@@ -16,31 +16,6 @@ void main() {
 '''
 
 FS_CODE = '''
-precision mediump float;
-
-const float C_0 = 0.0;
-const float C_1 = 1.0;
-const float C_PI = 3.141592653589793;
-const float C_2xPI = 2.0 * C_PI;
-const float C_1_PI = 1.0 / C_PI;
-const float C_EPSILON = 1e-6;
-
-float saturate(const in float a) { return clamp(a, C_0, C_1); }
-vec2 saturate(const in vec2 a) { return clamp(a, C_0, C_1); }
-vec3 saturate(const in vec3 a) { return clamp(a, C_0, C_1); }
-vec4 saturate(const in vec4 a) { return clamp(a, C_0, C_1); }
-
-float pow2(const in float a) { return a * a; }
-float pow3(const in float a) { return a * a * a; }
-float pow4(const in float a) { float b = a * a; return b * b; }
-
-const float GAMMA_IN = 2.2;
-vec3 gammaIn(const in vec3 c) { return pow(c, vec3(GAMMA_IN)); }
-vec4 gammaIn(const in vec4 c) { return pow(c, vec4(GAMMA_IN)); }
-const float GAMMA_OUT = 1.0 / GAMMA_IN;
-vec3 gammaOut(const in vec3 c) { return pow(c, vec3(GAMMA_OUT)); }
-vec4 gammaOut(const in vec4 c) { return pow(c, vec4(GAMMA_OUT)); }
-
 uniform vec3 u_envCol;        // 环境光颜色
 
 uniform vec3 u_paraDirW;      // 平行光源方向

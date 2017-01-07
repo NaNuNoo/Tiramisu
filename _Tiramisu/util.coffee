@@ -45,12 +45,12 @@ else
   bindCancelAnime = (handle) ->
     return clearTimeout(handle) * 1000
 
-updateAnime = (func) ->
+updateAnime = (updateFunc) ->
   handle = null
   wrapFunc = () ->
-    func()
-    handle = requestAnime(wrapFunc)
-  handle = requestAnime(wrapFunc)
+    updateFunc()
+    handle = bindRequestAnime(wrapFunc)
+  handle = bindRequestAnime(wrapFunc)
   return () ->
     return bindCancelAnime(handle)
 
