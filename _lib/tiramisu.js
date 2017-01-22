@@ -1438,10 +1438,7 @@
   ti.StaticMesh = StaticMesh;
 
   glState = {
-    clearColorRed: void 0,
-    clearColorGreen: void 0,
-    clearColorBlue: void 0,
-    clearColorAlpha: void 0,
+    clearColor: [void 0, void 0, void 0, void 0],
     clearDepth: void 0,
     clearStencil: void 0,
     viewPortOx: void 0,
@@ -1503,17 +1500,17 @@
 
   ti.clearFrame = function(param) {
     var clearColorAlpha, clearColorBlue, clearColorGreen, clearColorRed, clearDepth, clearFlag, clearStencil, ref11, ref12, ref13, ref14, ref15, ref16, updateFlag;
-    clearColorRed = (ref11 = param.clearColorRed) != null ? ref11 : 0;
-    clearColorGreen = (ref12 = param.clearColorGreen) != null ? ref12 : 0;
-    clearColorBlue = (ref13 = param.clearColorBlue) != null ? ref13 : 0;
-    clearColorAlpha = (ref14 = param.clearColorAlpha) != null ? ref14 : 0;
-    updateFlag = glState.clearColorRed !== param.clearColorRed || glState.clearColorGreen !== param.clearColorGreen || glState.clearColorBlue !== param.clearColorBlue || glState.clearColorAlpha !== param.clearColorAlpha;
+    clearColorRed = (ref11 = param.clearColor[0]) != null ? ref11 : 0;
+    clearColorGreen = (ref12 = param.clearColor[1]) != null ? ref12 : 0;
+    clearColorBlue = (ref13 = param.clearColor[2]) != null ? ref13 : 0;
+    clearColorAlpha = (ref14 = param.clearColor[3]) != null ? ref14 : 0;
+    updateFlag = glState.clearColor[0] !== clearColorRed || glState.clearColor[1] !== clearColorGreen || glState.clearColor[2] !== clearColorBlue || glState.clearColor[3] !== clearColorAlpha;
     if (updateFlag) {
-      glState.clearColorRed = param.clearColorRed;
-      glState.clearColorGreen = param.clearColorGreen;
-      glState.clearColorBlue = param.clearColorBlue;
-      glState.clearColorAlpha = param.clearColorAlpha;
-      webGL.clearColor(glState.clearColorRed, glState.clearColorGreen, glState.clearColorBlue, glState.clearColorAlpha);
+      glState.clearColor[0] = clearColorRed;
+      glState.clearColor[1] = clearColorGreen;
+      glState.clearColor[2] = clearColorBlue;
+      glState.clearColor[3] = clearColorAlpha;
+      webGL.clearColor(glState.clearColor[0], glState.clearColor[1], glState.clearColor[2], glState.clearColor[3]);
     }
     clearDepth = (ref15 = param.clearDepth) != null ? ref15 : 1.0;
     if (glState.clearDepth !== clearDepth) {
@@ -1526,14 +1523,13 @@
       webGL.clearStencil(clearStencil);
     }
     clearFlag = 0;
-    updateFlag = "number" === typeof param.clearColorRed || "number" === typeof param.clearColorGreen || "number" === typeof param.clearColorBlue || "number" === typeof param.clearColorAlpha;
-    if (updateFlag) {
+    if ('object' === typeof param.clearColor && param.clearColor) {
       clearFlag |= webGL.COLOR_BUFFER_BIT;
     }
-    if ("number" === typeof param.clearDepth) {
+    if ('number' === typeof param.clearDepth) {
       clearFlag |= webGL.DEPTH_BUFFER_BIT;
     }
-    if ("number" === typeof param.clearStencil) {
+    if ('number' === typeof param.clearStencil) {
       clearFlag |= webGL.STENCIL_BUFFER_BIT;
     }
     webGL.clear(clearFlag);
